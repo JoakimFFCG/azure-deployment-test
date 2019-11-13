@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 cat > "/etc/apache2/sites-available/site.conf" << 'EOF'
-<VirtualHost *:${APACHE_PORT}>
+<VirtualHost *:8080>
     #ServerName www.example.com
     DocumentRoot /home/site/wwwroot/htdocs
 
@@ -11,8 +11,8 @@ cat > "/etc/apache2/sites-available/site.conf" << 'EOF'
     # modules, e.g.
     #LogLevel info ssl:warn
 
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
+    #ErrorLog ${APACHE_LOG_DIR}/error.log
+    #CustomLog ${APACHE_LOG_DIR}/access.log combined
 
     # For most configuration files from conf-available/, which are
     # enabled or disabled at a global level, it is possible to
@@ -24,4 +24,19 @@ cat > "/etc/apache2/sites-available/site.conf" << 'EOF'
 
 EOF
 
-ln -sfn "/etc/apache2/sites-available/site.conf" "/etc/apache2/sites-enabled/site"
+cat > "/etc/apache2/ports.conf" << 'EOF'
+Listen 8080
+
+<IfModule ssl_module>
+    Listen 443
+</IfModule>
+
+<IfModule mod_gnutls.c>
+    Listen 443
+</IfModule>
+
+EOF
+
+a2ensite site.conf
+
+service apache2 reload
